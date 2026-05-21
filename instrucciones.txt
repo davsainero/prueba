@@ -1,0 +1,49 @@
+A partir de ahora actuarás como Senior Frontend Engineer y Lead Creative Developer para mi agencia, J&P Creative. Estamos trabajando en un proyecto interno para redes sociales en la carpeta actual (bocetoRedes).
+
+El objetivo es crear una experiencia web de un reloj de ultra-lujo (estética 'Dark Luxury') donde el usuario hace scroll y la cámara hace un viaje cinemático: empieza viendo el reloj desde fuera, se va acercando y termina atravesando el reloj como si fuera un portal hacia un vacío negro, donde aparece el texto.
+
+Como no tenemos el archivo .glb original, vamos a crear esta experiencia controlando un <iframe> mediante la Sketchfab Viewer API atada al scroll del usuario.
+
+Ejecuta este setup técnico utilizando nuestro stack (Next.js App Router, Tailwind, Framer Motion):
+
+1. COMPONENTE PRINCIPAL (SketchfabHero.tsx):
+
+Crea un componente de cliente ('use client').
+
+Inyecta el script oficial de Sketchfab: <script type="text/javascript" src="https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js"></script>.
+
+Crea un contenedor de 300vh de altura para permitir el scroll largo.
+
+Dentro, un contenedor sticky top-0 h-screen w-full bg-black que alojará el iframe y los textos.
+
+2. CONFIGURACIÓN DEL IFRAME:
+
+Usa este ID de modelo de Sketchfab: 9d9ac960bdc5426bb355df4f009526f2 (AP Skeleton Watch).
+
+Configura el iframe para que ocupe toda la pantalla (w-full h-full absolute inset-0 z-0).
+
+Limpia la interfaz de Sketchfab añadiendo estos parámetros a la URL del src: autostart=1, transparent=1, ui_infos=0, ui_stop=0, ui_watermark=0, ui_hint=0, ui_theme=dark.
+
+3. INICIALIZACIÓN DE LA API Y SCROLL:
+
+Usa useEffect para inicializar el cliente: const client = new window.Sketchfab(iframeRef.current); y arráncalo con client.init(...).
+
+Guarda la instancia de la API (api) en un estado de React cuando el callback devuelva success y viewerready.
+
+Usa useScroll de Framer Motion para rastrear el progreso de la página (scrollYProgress).
+
+4. EL VIAJE DE CÁMARA (El Portal):
+
+Usa useMotionValueEvent para escuchar los cambios en scrollYProgress.
+
+Crea un sistema de interpolación matemática (puedes usar simple JS o utilidades de Framer) para transicionar entre tres puntos clave de la cámara según el scroll avance de 0 a 1.
+
+Usa la función de la API de Sketchfab api.setCameraLookAt([eyeX, eyeY, eyeZ], [targetX, targetY, targetZ], 0) en cada frame de scroll para actualizar la vista.
+
+5. VARIABLES AJUSTABLES Y UI:
+
+Define arriba del componente unas constantes con los vectores (arrays) de posición de cámara (eye y target) para el INICIO, MITAD y FIN del viaje. Déjalo con valores genéricos; yo los ajustaré a mano para que la cámara pase por el hueco exacto del reloj.
+
+Añade un bloque de texto (relative z-10) que haga fade-in al llegar al final del scroll, con tipografía sans-serif color crema (#E8E6D9) que diga 'TIMELESS PRECISION'.
+
+Construye este componente base y asegúrate de que esté preparado para que yo solo tenga que jugar con los arrays de coordenadas
